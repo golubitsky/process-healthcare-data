@@ -4,11 +4,13 @@ This repo contains a solution to https://github.com/serif-health/takehome. Pleas
 
 ## Solution
 
-Cross-referencing the 50 URLs containing "NY" with information from the search tool (manually), we get **14 URLs**, listed in `urls_corresponding_to_anthems_ppo_in_new_york_state.txt`.
+Cross-referencing the 50 URLs containing "NY" with information from the search tool (manually), we get **15 URLs**, listed in `urls_corresponding_to_anthems_ppo_in_new_york_state.txt`.
 
 I have also saved the `intermediate_output_from_script.txt`, annotated at the end of each row with the cross-references using the search tool.
 
 For more information, see the sections "Explanation and Strategy" and "Performance" below.
+
+For a possible improvement to the result, see the section "Notable edge cases and possible extension idea" below.
 
 ## Install
 
