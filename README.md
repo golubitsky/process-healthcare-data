@@ -82,34 +82,38 @@ for each reporting_structure:
 
 It turned out that each of the matching `in_network_files` had a consist description of "In-Network Negotiated Rates Files", which seemed promising.
 
-There turned out to be 50 such URLs pointing to file names like ``.
+There turned out to be 50 such URLs.
 
 ### Hypothesis on Anthem's MRF naming convention
 
-These 50 URLs follow a convention summarized by two representative example file names:
+These 50 URLs point to file names that follow a convention summarized by two representative examples:
 
 1. NY_PPPNMED0001.json.gz
 2. NY_GGHAMEDAP33_08_09.json.gz
 
-Based on these two representative example file names, the convention could be:
+Based on these two representative examples, a hypothetical convention _could_ be:
 
 1. 2 chars: State Abbreviation: NY stands for New York.
 2. <underscore>
-3. 4 chars: Plan/Region Code (?)
+3. 4 chars: Plan/Region Code **(?)**
    1. examples of PPOs include GGHA, HXPX, HYRE
    2. examples of non-PPOs include JBDT
 4. 3 chars: Service Type: value is always MED; probably stands for Medical (?)
-5. 4 chars: Sequence Number or Identifier (?); examples include 0001 or AP33
+5. 4 chars: Sequence Number or Identifier **(?)**; examples include 0001 or AP33
 6. <underscore>
 7. 2 chars (only for MRFs split into multiple files): index of this MRF
 8. <underscore>
 9. 2 chars (only for MRFs split into multiple files): number of files into which the MRF is split
 
+It would be helpful to learn the meaning of numbers 3 and 5 in particular. Perhaps it is possible to get in touch with the producer of the data for more clarity here?
+
 ### Second approach continued: heuristic to identify PPOs
 
-At this point, without knowing Anthem's naming convention, there is not enough information to identify each of these URLs as pointing to a PPO or not. But again, using the hint about the tool https://www.anthem.com/machine-readable-file/search/, we can glean information from the UI that is not present in the table of contents file.
+At this point, without knowing Anthem's naming convention, there is not enough information to identify each of these URLs as pertaining to a PPO or not.
 
-To use the UI, we need EINs, which come from each plan. Given the 50 URLs containing "NY" (see above), I decided to:
+However, using the hint about the tool https://www.anthem.com/machine-readable-file/search/, we can glean information from the search tool UI that is not present (or at least appears not to be present) in the table of contents file.
+
+To use the UI, we need EINs, which come from each plan. Given the 50 URLs containing "NY" (see above), we can complete the final step of our second plan:
 
 ```
 for each reporting_structure:
@@ -117,33 +121,48 @@ for each reporting_structure:
     examine the corresponding `reporting_plans` for evidence that _any one of them_ is a PPO
 ```
 
-To complete the final step, we can search for 'ppo' in the name of any plan.
+To complete the final step, as a heuristic, we can search for 'ppo' in the name of any plan.
 
-The UI in this tool makes the distinction between PPO and EPO (and FFS, POS); the file names themselves do NOT make the distinction.
+The advantage of the UI in this tool (relative to the MRF file names themselves) is that it appears to clearly identify which URLs pertain to PPO or to EPO (or FFS, POS, and possibly others). For example:
 
 - PPO
   - Example EIN: 37-1441668
-  - Example file name: NY_GGHAMEDAP33_01_09.json.gz
+  - Example file name NY_GGHAMEDAP33_01_09.json.gz appears as "NY_PPO_GGHAMEDAP33_01_09.json.gz" on the UI
 - EPO
   - Example EIN: 37-1441668
-  - Example file name: NY_GZHYMEDAP36.json.gz
-- Highmark
-  - identified using `description` field contains "highmark"
+  - Example file name NY_GZHYMEDAP36.json.gz appears as "NY_EPO_GZHYMEDAP36.json.gz" on the UI
+- Highmark files follow a different convention altogether
+  - Identified in the table of contents file using `description` field contains "highmark"
   - Example EIN: 85-4347090
-  - Example file name: 2024-07_800_72A0_in-network-rates_01_of_02.json.gz
-    - File name doesn't contain "NY\_" so we won't have false positives.
+  - Example file name: 2024-07_800_72A0_in-network-rates_01_of_02.json.gz appears as "2024-07_NY_72A0_in-network-rates_01_of_02.json.gz" on the UI
+    - Since the file name doesn't contain "NY\_" we won't have false positives.
 
-One problem is that Anthem's naming convention for MRFs seems to not differentiate between EPOs and PPOs.
+### Notable edge cases and possible extension idea
 
-Edge cases:
-
+- False negative using the heuristic
+  - Using EIN 87-2928230 we see that MRF https://antm-pt-prod-dataz-nogbd-nophi-us-east1.s3.amazonaws.com/anthem/NY_JBDTMED0000.json.gz
+    - although it has no corresponding PPO plans using the heuristic in `extract_urls.py`, it appears as "NY_PPO_JBDTMED0000.json.gz"
+    - thus, according to the tool, this MRF contains PPO data
+- False negative using the heuristic
+  - Incidentally, looking at EIN 87-2928230 I found that the same file can be referenced as both PPO and EPO across multiple EINs
+    - The same URL appears differently in the UI across two EINs below
+      - https://antm-pt-prod-dataz-nogbd-nophi-us-east1.s3.amazonaws.com/anthem/NY_HXNWMED0000.json.gz
+    - EIN 87-2928230
+      - appears as "NY_PPO_HXNWMED0000.json.gz" on the UI
+        - **this was NOT found using the heuristic, and I added it manually to the final result**
+    - EIN 57-1166714
+      - https://antm-pt-prod-dataz-nogbd-nophi-us-east1.s3.amazonaws.com/anthem/NY_HXNWMED0000.json.gz
+      - appears as "NY_EPO_HXNWMED0000.json.gz" on the UI
+    - **Possible future extension**
+      - exhaustively cross-reference _all_ (not just one or two) EINs corresponding to an NY URL?
+      - Alternatively, learn more about Anthem's MRF naming convention.
+- False positive using the heuristic
+  - For EIN 13-3680053, since it references both NY_HXPYMED0004.json.gz (EPO according to the tool) and NY_HXPXMED0009.json.gz (PPO according to the tool)
+  - NY_HXPYMED0004.json.gz has to be ruled out manually using the tool
 - For EIN 38-4042589 there is a file that appears as both PPO and EPO
   - https://antm-pt-prod-dataz-nogbd-nophi-us-east1.s3.amazonaws.com/anthem/NY_GZHYMEDAP36.json.gz
-- NY_JBDTMED0000.json.gz no ppo found; example EIN that references this file 87-2928230 K HEALTH - WCM SERVICES LLC - ANTHEM
-  - but this file _is_ for a PPO, according to the tool
-- Similarly, for EIN 87-2928230 the tool shows that NY*HXNWMED0000.json.gz \_is* for a _PPO_, but it was ruled out using the method I used
-- For EIN 13-3680053, it references both NY_HXPYMED0004.json.gz (EPO according to the tool) and NY_HXPXMED0009.json.gz (PPO according to the tool)
-  - this uncovers another edge case where NY_HXPYMED0004.json.gz has to be ruled out manually using the tool
+    - appears as both "NY_EPO_GZHYMEDAP36.json.gz" and "NY_PPO_GZHYMEDAP36.json.gz" on the UI
+    - Hypothesis: could mean that this one MRF contains both PPO and EPO pricing data
 
 ## Performance
 
