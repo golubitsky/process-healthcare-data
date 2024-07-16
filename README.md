@@ -87,7 +87,7 @@ A potential naming convention might be (underscores omitted for brevity):
 
 Further clarity on the plan/region code and sequence number would be helpful.
 
-### Heuristic to Identify PPOs
+### Heuristic to Identify MRF files Containing Anthem PPO Pricing Data
 
 Using the Anthem Search Tool with EINs from the 50 URLs containing "NY", we verify which URLs pertain to PPOs.
 
