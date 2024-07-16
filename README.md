@@ -18,7 +18,7 @@ For potential improvements, see "Notable Edge Cases and Possible Extension Ideas
 2. From the project root, install dependencies using:
 
 ```
-pip3 install -r requirements.txt`
+pip3 install -r requirements.txt
 ```
 
 ## Run
