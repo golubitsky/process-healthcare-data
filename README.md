@@ -31,8 +31,6 @@ python3 extract_urls.py 2024-07-01_anthem_index.json
 
 According to the [CMS](https://www.cms.gov/healthplan-price-transparency/resources/technical-clarification), "The individual in-network rate files linked to the Table of Contents file need not follow a defined naming convention". Discussions, such as [this one](https://github.com/CMSgov/price-transparency-guide/discussions/619), also mention inconsistent or unspecified file naming conventions, particularly for Anthem.
 
-Unfortunately, "The individual in-network rate files linked to the Table of Contents file need not follow a defined naming convention" [source](https://www.cms.gov/healthplan-price-transparency/resources/technical-clarification).
-
 ## Explanation and Strategy
 
 We have three sources of information:
