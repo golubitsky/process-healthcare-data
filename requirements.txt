@@ -1,0 +1,2 @@
+ijson==3.3.0
+readchar==4.1.0
