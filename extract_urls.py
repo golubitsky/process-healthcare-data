@@ -4,11 +4,6 @@ import sys
 import collections
 
 
-def is_matching(value):
-    l = value.lower()
-    return ("new york" in l or " ny " in l) and "ppo" in l
-
-
 def with_dash(ein):
     index = 2
     return ein[:index] + "-" + ein[index:]
@@ -40,7 +35,7 @@ def extract_urls(file_path):
                             if plan["plan_id_type"] == "EIN":
                                 representative_plan = plan
                                 break
-                    
+
                     if not representative_plan:
                         # There are no PPOs and there are no EIN identifiers.
                         representative_plan = reporting_structure["reporting_plans"][0]
@@ -58,4 +53,4 @@ def extract_urls(file_path):
 
 
 if __name__ == "__main__":
-    result_urls = extract_urls(sys.argv[1])
+    extract_urls(sys.argv[1])
