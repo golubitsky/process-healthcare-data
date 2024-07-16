@@ -76,7 +76,7 @@ These 50 URLs follow a pattern. Here are two representative examples:
 1. NY_PPPNMED0001.json.gz
 2. NY_GGHAMEDAP33_08_09.json.gz
 
-A potential naming convention might be:
+A potential naming convention might be (underscores omitted for brevity):
 
 1. 2 chars: State Abbreviation (e.g., NY for New York).
 2. 4 chars: Plan/Region Code (e.g., GGHA, HXPX, HYRE for PPOs).
